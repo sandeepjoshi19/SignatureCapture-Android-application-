@@ -24,15 +24,17 @@ public class SignatureCapture extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_signature_capture);
-        GestureOverlayView sign = (GestureOverlayView) findViewById(R.id.gestureOverlayView);
-        sign.addOnGesturePerformedListener(new GestureOverlayView.OnGesturePerformedListener() {
+        final GestureOverlayView sign = (GestureOverlayView) findViewById(R.id.gestureOverlayView);
+        Button button=(Button)findViewById(R.id.button);
+        button.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onGesturePerformed(GestureOverlayView overlay, Gesture gesture) {
+            public void onClick(View v) {
                 try {
+                    sign.setDrawingCacheEnabled(true);
                     String path= Environment.getExternalStorageDirectory().toString();
                     File file=new File(path,"sign.png");
                     OutputStream fout=new FileOutputStream(file);
-                    Bitmap obtainedsign = gesture.toBitmap(360, 640, 10, Color.GREEN);
+                    Bitmap obtainedsign = sign.getGesture().toBitmap(300,300,10,Color.BLUE);
                     obtainedsign.compress(Bitmap.CompressFormat.PNG, 100, fout);
                     fout.flush();
                     fout.close();
@@ -40,14 +42,15 @@ public class SignatureCapture extends AppCompatActivity {
                     Intent intent = new Intent(SignatureCapture.this, ObtainedSign.class);
                     intent.putExtra("pic_path", file.getAbsolutePath());
                     startActivity(intent);
+                    sign.clear(true);
                 }catch (Exception e)
                 {
-                    Toast.makeText(SignatureCapture.this,e.getMessage(),Toast.LENGTH_LONG).show();
+
                 }
-
-
             }
         });
+
+
 
     }
 }
